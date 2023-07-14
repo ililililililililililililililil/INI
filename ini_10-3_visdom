@@ -1,0 +1,48 @@
+import torch
+import torch.nn as nn
+import torchvision
+import torchvision.datasets as dsets
+
+import visdom
+vis = visdom.Visdom()
+
+vis.text("Hello, world!",env="main")
+
+a=torch.randn(3,200,200)
+vis.image(a)
+
+vis.images(torch.Tensor(3,3,28,28))
+
+# 시간이 좀 걸립니다.
+MNIST = dsets.MNIST(root="./MNIST_data",train = True,transform=torchvision.transforms.ToTensor(), download=True)
+cifar10 = dsets.CIFAR10(root="./cifar10",train = True, transform=torchvision.transforms.ToTensor(),download=True)
+
+data = cifar10.__getitem__(0)
+print(data[0].shape)
+vis.images(data[0],env="main")
+
+data = MNIST.__getitem__(0)
+print(data[0].shape)
+vis.images(data[0],env="main")
+
+data_loader = torch.utils.data.DataLoader(dataset = MNIST,
+                                          batch_size = 32,
+                                          shuffle = False)
+
+for num, value in enumerate(data_loader):
+    value = value[0]
+    print(value.shape)
+    vis.images(value)
+    break
+
+vis.close(env="main")
+
+Y_data = torch.randn(5)
+plt = vis.line (Y=Y_data)
+
+X_data = torch.Tensor([1,2,3,4,5])
+plt = vis.line(Y=Y_data, X=X_data)
+
+Y_append = torch.randn(1)
+X_append = torch.Tensor([6])
+vis.line(Y=Y_append, X=X_append, win=plt, update='append')
